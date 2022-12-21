@@ -1,4 +1,4 @@
-FW_URL		:= https://github.com/raspberrypi/firmware/branches/stable/boot
+FW_URL		:= https://github.com/raspberrypi/firmware.git/trunk/boot
 
 EFI_BUILD	:= RELEASE
 EFI_ARCH	:= AARCH64
@@ -20,32 +20,22 @@ SHELL		:= /bin/bash
 
 all : sdcard sdcard.img sdcard.zip
 
-submodules :
-	#git submodule update --init --recursive
-
-firmware :
-	if [ ! -e firmware ] ; then \
-		$(RM) -rf firmware-tmp ; \
-		svn export $(FW_URL) firmware-tmp && \
-		mv firmware-tmp firmware ; \
-	fi
-
 efi : $(EFI_FD)
 
-efi-basetools : submodules
+efi-basetools :
 	$(MAKE) -C edk2/BaseTools
 
-$(EFI_FD) : submodules efi-basetools
+$(EFI_FD) : efi-basetools
 	. ./edksetup.sh && \
 	build -b $(EFI_BUILD) -a $(EFI_ARCH) -t $(EFI_TOOLCHAIN) \
 		-p $(EFI_DSC) $(EFI_FLAGS)
 
 ipxe : $(IPXE_EFI)
 
-$(IPXE_EFI) : submodules
+$(IPXE_EFI) :
 	$(MAKE) -C $(IPXE_SRC) CROSS=$(IPXE_CROSS) CONFIG=rpi $(IPXE_TGT)
 
-sdcard : firmware efi ipxe
+sdcard : efi ipxe
 	$(RM) -rf sdcard
 	mkdir -p sdcard
 	cp -r $(sort $(filter-out firmware/kernel%,$(wildcard firmware/*))) \
@@ -71,9 +61,9 @@ update:
 tag :
 	git tag v`git show -s --format='%ad' --date=short | tr -d -`
 
-.PHONY : submodules firmware efi efi-basetools $(EFI_FD) ipxe $(IPXE_EFI) \
-	 sdcard sdcard.img
+.PHONY : efi efi-basetools $(EFI_FD) ipxe $(IPXE_EFI) \
+	 sdcard
 
 clean :
-	$(RM) -rf firmware Build sdcard sdcard.img sdcard.zip
+	$(RM) -rf Build sdcard sdcard.zip
 	if [ -d $(IPXE_SRC) ] ; then $(MAKE) -C $(IPXE_SRC) clean ; fi
