@@ -1,0 +1,37 @@
+diff --git a/Platform/RaspberryPi/Drivers/FdtDxe/FdtDxe.c b/Platform/RaspberryPi/Drivers/FdtDxe/FdtDxe.c
+index cbbc2ad30d..4280f979f7 100644
+--- a/Platform/RaspberryPi/Drivers/FdtDxe/FdtDxe.c
++++ b/Platform/RaspberryPi/Drivers/FdtDxe/FdtDxe.c
+@@ -388,7 +388,7 @@ SyncPcie (
+    * triggering the mailbox by removing the node.
+    */
+ 
+-  Node = fdt_path_offset (mFdtImage, "/scb/pcie@7d500000/pci");
++  Node = fdt_path_offset (mFdtImage, "/scb/pcie@7d500000/pci@1,0");
+   if (Node < 0) {
+     // This can happen on CM4/etc which doesn't have an onboard XHCI
+     DEBUG ((DEBUG_INFO, "%a: failed to locate /scb/pcie@7d500000/pci\n", __FUNCTION__));
+diff --git a/Platform/RaspberryPi/RPi4/RPi4.dsc b/Platform/RaspberryPi/RPi4/RPi4.dsc
+index 8ba0ca6185..a5f166455f 100644
+--- a/Platform/RaspberryPi/RPi4/RPi4.dsc
++++ b/Platform/RaspberryPi/RPi4/RPi4.dsc
+@@ -511,8 +511,8 @@
+   #
+   # Supporting > 3GB of memory.
+   #
+-  gRaspberryPiTokenSpaceGuid.PcdRamMoreThan3GB|L"RamMoreThan3GB"|gConfigDxeFormSetGuid|0x0|0
+-  gRaspberryPiTokenSpaceGuid.PcdRamLimitTo3GB|L"RamLimitTo3GB"|gConfigDxeFormSetGuid|0x0|1
++  gRaspberryPiTokenSpaceGuid.PcdRamMoreThan3GB|L"RamMoreThan3GB"|gConfigDxeFormSetGuid|0x0|1
++  gRaspberryPiTokenSpaceGuid.PcdRamLimitTo3GB|L"RamLimitTo3GB"|gConfigDxeFormSetGuid|0x0|0
+ 
+   #
+   # Device Tree and ACPI selection.
+@@ -521,7 +521,7 @@
+   # 1 - SYSTEM_TABLE_MODE_BOTH
+   # 2 - SYSTEM_TABLE_MODE_DT
+   #
+-  gRaspberryPiTokenSpaceGuid.PcdSystemTableMode|L"SystemTableMode"|gConfigDxeFormSetGuid|0x0|0
++  gRaspberryPiTokenSpaceGuid.PcdSystemTableMode|L"SystemTableMode"|gConfigDxeFormSetGuid|0x0|2
+ 
+   #
+   # Enable a fan in the ACPI thermal zone on GPIO pin #
